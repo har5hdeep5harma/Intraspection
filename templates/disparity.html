@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disparity Calculator - Social Anxiety Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            color: var(--dark);
+        }
+
+        /* Animate main sections on load */
+        .disparity-container > * {
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .disparity-container > *:nth-child(1) { animation-delay: 0.1s; }
+        .disparity-container > *:nth-child(2) { animation-delay: 0.2s; }
+        .disparity-container > *:nth-child(3) { animation-delay: 0.3s; }
+        .disparity-container > *:nth-child(4) { animation-delay: 0.4s; }
+        .disparity-container > *:nth-child(5) { animation-delay: 0.5s; }
+
+        .disparity-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .instruction-box {
+            background: white;
+            color: var(--dark);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .instruction-box h2 {
+            margin-top: 0;
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .instruction-box p {
+            line-height: 1.8;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+
+        .survey-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .survey-section.active {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .survey-section h3 {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .survey-section .subtitle {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .question-group {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .question-group:hover {
+            background: #f0f2f5;
+            border-left-color: var(--secondary);
+        }
+
+        .question-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 14px;
+            border-radius: 8px;
+            background: var(--gray-light);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        input[type="range"]:hover {
+            background: #cbd5e1;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            border: 4px solid white;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 70px;
+            border: 2px solid var(--border-color);
+        }
+
+        .value-display {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .scale-markers {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+            margin-top: 5px;
+        }
+
+        .scale-markers span {
+            font-size: 12px;
+            color: var(--gray-light);
+            width: 20px;
+            text-align: center;
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .phase-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .phase-dot.active {
+            background: var(--primary);
+            transform: scale(1.5);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .phase-dot.completed {
+            background: var(--success);
+        }
+
+        .section-transition {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            color: var(--dark);
+            border-radius: 15px;
+            margin: 30px 0;
+            display: none;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .section-transition.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .section-transition h3 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--success);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 40px;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .result-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .coefficient-display {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .coefficient-value {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .coefficient-label {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .interpretation {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .averages-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .average-box {
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            background: #f8f9fa;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .average-box.current {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .average-box.desired {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .average-value {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--dark);
+        }
+
+        .average-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .description-box {
+            padding: 25px;
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .description-box p {
+            margin: 10px 0;
+            line-height: 1.8;
+            color: var(--dark);
+        }
+
+        .advice-box {
+            padding: 25px;
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .advice-box strong {
+            color: #059669;
+        }
+
+        .advice-box p {
+            color: var(--dark);
+        }
+
+        .top-areas {
+            margin: 30px 0;
+        }
+
+        .area-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #fef3c7;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .area-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #92400e;
+        }
+
+        .area-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .area-stats span {
+            padding: 5px 12px;
+            background: white;
+            border-radius: 6px;
+            color: var(--dark);
+        }
+
+        .strong-areas {
+            margin: 30px 0;
+        }
+
+        .strong-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #d1fae5;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #10b981;
+        }
+
+        .strong-item .area-name {
+            color: #065f46;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .disparity-container {
+                padding: 10px;
+            }
+
+            .survey-section {
+                padding: 20px;
+            }
+
+            .question-group {
+                padding: 15px;
+            }
+
+            .coefficient-value {
+                font-size: 48px;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .area-item, .strong-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .area-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">
+                Intraspection
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict">Anxiety Prediction</a></li>
+                <li><a href="/disparity">Disparity Calculator</a></li>
+                <li><a href="/profiling">Psychological Profiling</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero" style="padding: 2rem 0;">
+            <h1 style="font-size: 2.5rem;">Disparity Coefficient Meter</h1>
+            <p>Measure the gap between your current reality and your desired state across 14 key life factors</p>
+        </div>
+
+        <div class="disparity-container">
+        <div class="phase-indicator">
+            <div class="phase-dot active" id="phase1-dot"></div>
+            <div class="phase-dot" id="phase2-dot"></div>
+            <div class="phase-dot" id="phase3-dot"></div>
+        </div>
+
+        <form id="disparityForm">
+            <!-- Phase 1: Current State -->
+            <div id="phase1" class="survey-section active">
+                <h3>
+                    Phase 1: Your Current Reality
+                </h3>
+                <p class="subtitle">Rate where you are RIGHT NOW on each factor (1 = Low, 7 = High)
+                </p>
+                <p class="subtitle">Just Reflect on: <br>
+                    1. How do you know your answer is factual? <br>
+                    2. How factual do you think it is?<br></p>
+
+                <div class="question-group">
+                    <label class="question-label">1. Intelligence</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_intelligence" class="slider" data-target="c-intelligence">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-intelligence">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">2. Knowledge</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_knowledge" class="slider" data-target="c-knowledge">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-knowledge">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">3. Wealth</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_wealth" class="slider" data-target="c-wealth">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-wealth">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">4. Sex / Intimacy</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_sex" class="slider" data-target="c-sex">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-sex">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">5. Health</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_health" class="slider" data-target="c-health">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-health">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">6. Motivation</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_motivation" class="slider" data-target="c-motivation">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-motivation">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">7. Education</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_education" class="slider" data-target="c-education">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-education">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">8. Special Skills</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_special_skills" class="slider" data-target="c-special_skills">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-special_skills">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">9. Attractiveness</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_attractiveness" class="slider" data-target="c-attractiveness">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-attractiveness">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">10. Social Skills</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_social_skills" class="slider" data-target="c-social_skills">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-social_skills">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">11. Resistance to Anxiety and Fear</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_anxiety_resistance" class="slider" data-target="c-anxiety_resistance">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-anxiety_resistance">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">12. Resistance to Depression</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_depression_resistance" class="slider" data-target="c-depression_resistance">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-depression_resistance">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">13. Power</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_power" class="slider" data-target="c-power">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-power">4</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">14. Enlightened / Self-Awareness</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="4" name="current_enlightened" class="slider" data-target="c-enlightened">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="c-enlightened">4</span></div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn btn-primary" onclick="nextPhase()">Continue to Desired State →</button>
+                </div>
+            </div>
+
+            <!-- Transition Screen -->
+            <div id="transition" class="section-transition">
+                <h3>Great Work!</h3>
+                <p>Now, let's explore your desired state, where you WANT to be.</p>
+                <p>Be honest about your aspirations, but also realistic about what's achievable.</p>
+            </div>
+
+            <!-- Phase 2: Desired State -->
+            <div id="phase2" class="survey-section hidden">
+                <h3>
+                    Phase 2: Your Desired State
+                </h3>
+                <p class="subtitle">Rate where you WANT to be on each factor (1 = Low, 7 = High)</p>
+                <p class="subtitle">Just Reflect on: <br>
+                    1. How do you know your answer is factual? <br>
+                    2. How factual do you think it is?<br></p>
+
+                <div class="question-group">
+                    <label class="question-label">1. Intelligence</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_intelligence" class="slider" data-target="d-intelligence">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-intelligence">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">2. Knowledge</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_knowledge" class="slider" data-target="d-knowledge">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-knowledge">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">3. Wealth</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_wealth" class="slider" data-target="d-wealth">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-wealth">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">4. Sex / Intimacy</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_sex" class="slider" data-target="d-sex">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-sex">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">5. Health</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_health" class="slider" data-target="d-health">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-health">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">6. Motivation</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_motivation" class="slider" data-target="d-motivation">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-motivation">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">7. Education</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_education" class="slider" data-target="d-education">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-education">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">8. Special Skills</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_special_skills" class="slider" data-target="d-special_skills">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-special_skills">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">9. Attractiveness</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_attractiveness" class="slider" data-target="d-attractiveness">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-attractiveness">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">10. Social Skills</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_social_skills" class="slider" data-target="d-social_skills">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-social_skills">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">11. Resistance to Anxiety and Fear</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_anxiety_resistance" class="slider" data-target="d-anxiety_resistance">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-anxiety_resistance">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">12. Resistance to Depression</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_depression_resistance" class="slider" data-target="d-depression_resistance">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-depression_resistance">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">13. Power</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_power" class="slider" data-target="d-power">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-power">5</span></div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">14. Enlightened / Self-Awareness</label>
+                    <div class="slider-container">
+                        <div class="slider-labels"><span>Low</span><span>High</span></div>
+                        <div class="slider-wrapper">
+                            <input type="range" min="1" max="7" value="5" name="desired_enlightened" class="slider" data-target="d-enlightened">
+                            <div class="scale-markers"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        </div>
+                        <div class="value-display"><span class="slider-value" id="d-enlightened">5</span></div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn btn-secondary" onclick="previousPhase()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="calculateResults()">Calculate Disparity Coefficient</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results Section -->
+        <div id="results" class="results-container">
+            <div class="result-card">
+                <div class="coefficient-display" id="coefficientDisplay">
+                    <p class="coefficient-label">Your Disparity Coefficient</p>
+                    <div class="coefficient-value" id="coefficientValue">0.00</div>
+                    <p class="interpretation" id="interpretation">-</p>
+                </div>
+
+                <div class="averages-display">
+                    <div class="average-box current">
+                        <p class="average-label">Current Average</p>
+                        <div class="average-value" style="color: #3b82f6;" id="currentAverage">0.00</div>
+                        <p style="font-size: 12px; color: #666;">out of 7</p>
+                    </div>
+                    <div class="average-box desired">
+                        <p class="average-label">Desired Average</p>
+                        <div class="average-value" style="color: #10b981;" id="desiredAverage">0.00</div>
+                        <p style="font-size: 12px; color: #666;">out of 7</p>
+                    </div>
+                </div>
+
+                <div class="description-box">
+                    <h3 style="color: #3b82f6; margin-top: 0;">What This Means</h3>
+                    <p id="description">-</p>
+                </div>
+
+                <div class="advice-box">
+                    <h3 style="color: #059669; margin-top: 0;">Recommendations</h3>
+                    <p><strong>Advice:</strong> <span id="advice">-</span></p>
+                </div>
+
+                <div id="topAreasSection" class="top-areas" style="display: none;">
+                    <h3 style="color: #92400e;">Top Areas for Improvement</h3>
+                    <div id="topAreasList"></div>
+                </div>
+
+                <div id="strongAreasSection" class="strong-areas" style="display: none;">
+                    <h3 style="color: #059669;">✨ Your Strong Areas</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Areas where you're already at or above your desired level:</p>
+                    <div id="strongAreasList"></div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn btn-primary" onclick="resetForm()">Take Assessment Again</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Back to Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.slider').forEach(slider => {
+            slider.addEventListener('input', function() {
+                const targetId = this.getAttribute('data-target');
+                const valueDisplay = document.getElementById(targetId);
+                valueDisplay.textContent = this.value;
+            });
+        });
+
+        function nextPhase() {
+            document.getElementById('phase1').classList.add('hidden');
+            document.getElementById('phase1').classList.remove('active');
+            document.getElementById('transition').classList.add('show');
+            document.getElementById('phase1-dot').classList.remove('active');
+            document.getElementById('phase1-dot').classList.add('completed');
+            document.getElementById('phase2-dot').classList.add('active');
+            
+            setTimeout(() => {
+                document.getElementById('transition').classList.remove('show');
+                document.getElementById('phase2').classList.remove('hidden');
+                document.getElementById('phase2').classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 2000);
+        }
+
+        function previousPhase() {
+            document.getElementById('phase2').classList.add('hidden');
+            document.getElementById('phase2').classList.remove('active');
+            document.getElementById('phase1').classList.remove('hidden');
+            document.getElementById('phase1').classList.add('active');
+            document.getElementById('phase2-dot').classList.remove('active');
+            document.getElementById('phase1-dot').classList.remove('completed');
+            document.getElementById('phase1-dot').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function calculateResults() {
+            const form = document.getElementById('disparityForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+
+            try {
+                const response = await fetch('/api/disparity', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('phase2').classList.add('hidden');
+                    document.getElementById('phase2').classList.remove('active');
+                    document.getElementById('phase2-dot').classList.remove('active');
+                    document.getElementById('phase2-dot').classList.add('completed');
+                    document.getElementById('phase3-dot').classList.add('active');
+                    document.getElementById('phase3-dot').classList.add('completed');
+                    
+                    displayResults(result);
+                    document.getElementById('results').classList.add('show');
+                    
+                    setTimeout(() => {
+                        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                } else {
+                    alert('Error calculating disparity: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function displayResults(result) {
+            const displayBox = document.getElementById('coefficientDisplay');
+            displayBox.style.background = `linear-gradient(135deg, ${result.color} 0%, ${adjustColor(result.color, -20)} 100%)`;
+            
+            document.getElementById('coefficientValue').textContent = result.disparity_coefficient.toFixed(2);
+            document.getElementById('interpretation').textContent = result.interpretation;
+            document.getElementById('currentAverage').textContent = result.current_average.toFixed(2);
+            document.getElementById('desiredAverage').textContent = result.desired_average.toFixed(2);
+            document.getElementById('description').textContent = result.description;
+            document.getElementById('advice').textContent = result.advice;
+            
+            if (result.top_areas && result.top_areas.length > 0) {
+                document.getElementById('topAreasSection').style.display = 'block';
+                const topAreasList = document.getElementById('topAreasList');
+                topAreasList.innerHTML = '';
+                
+                result.top_areas.forEach(area => {
+                    const areaDiv = document.createElement('div');
+                    areaDiv.className = 'area-item';
+                    areaDiv.innerHTML = `
+                        <div class="area-name">${area.name}</div>
+                        <div class="area-stats">
+                            <span><strong>Current:</strong> ${area.current}</span>
+                            <span><strong>Desired:</strong> ${area.desired}</span>
+                            <span style="background: #fbbf24; font-weight: 600;"><strong>Gap:</strong> ${area.gap.toFixed(1)}</span>
+                        </div>
+                    `;
+                    topAreasList.appendChild(areaDiv);
+                });
+            }
+            
+            if (result.strong_areas && result.strong_areas.length > 0) {
+                document.getElementById('strongAreasSection').style.display = 'block';
+                const strongAreasList = document.getElementById('strongAreasList');
+                strongAreasList.innerHTML = '';
+                
+                result.strong_areas.forEach(area => {
+                    const areaDiv = document.createElement('div');
+                    areaDiv.className = 'strong-item';
+                    areaDiv.innerHTML = `
+                        <div class="area-name">${area.name}</div>
+                        <div class="area-stats">
+                            <span><strong>Current:</strong> ${area.current}</span>
+                            <span><strong>Desired:</strong> ${area.desired}</span>
+                            <span style="background: #86efac; font-weight: 600;">✓ Achieved</span>
+                        </div>
+                    `;
+                    strongAreasList.appendChild(areaDiv);
+                });
+            }
+        }
+
+        function adjustColor(color, amount) {
+            return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+        }
+
+        function resetForm() {
+            document.getElementById('disparityForm').reset();
+            document.querySelectorAll('.slider-value').forEach(elem => {
+                const slider = document.querySelector(`[data-target="${elem.id}"]`);
+                elem.textContent = slider.value;
+            });
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('phase1').classList.remove('hidden');
+            document.getElementById('phase1').classList.add('active');
+            document.getElementById('phase1-dot').classList.add('active');
+            document.getElementById('phase1-dot').classList.remove('completed');
+            document.getElementById('phase2-dot').classList.remove('active');
+            document.getElementById('phase2-dot').classList.remove('completed');
+            document.getElementById('phase3-dot').classList.remove('active');
+            document.getElementById('phase3-dot').classList.remove('completed');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    </div> 
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>अंतर्दृष्टि</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">
+                Intraspection
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict">Anxiety Prediction</a></li>
+                <li><a href="/disparity">Disparity Calculator</a></li>
+                <li><a href="/profiling">Psychological Profiling</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>अंतर्दृष्टि</h1>
+        <p>Know yourself, without becoming your thoughts.</p>
+    </section>
+
+    <div class="container">
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">🤖</div>
+                <h2>Anxiety Prediction</h2>
+                <p>Use state-of-the-art machine learning models to predict anxiety levels based on behavioral and lifestyle factors. Choose from multiple trained models.</p>
+                <a href="/predict" class="btn btn-primary">Start Prediction</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h2>Disparity Calculator</h2>
+                <p>Calculate your disparity level using advanced psychological metrics. Understand the gap between your current state and optimal well-being.</p>
+                <a href="/disparity" class="btn btn-primary">Calculate Disparity</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🎭</div>
+                <h2>Psychological Profiling</h2>
+                <p>Complete a comprehensive behavioral observation survey to receive detailed psychological insights and personalized recommendations.</p>
+                <a href="/profiling" class="btn btn-primary">Take Survey</a>
+            </div>
+        </div>
+
+        <div class="form-section" style="margin-top: 4rem;">
+            <h2 style="text-align: center; margin-bottom: 1rem;">About This Platform</h2>
+            <p style="text-align: center; color: var(--gray); max-width: 800px; margin: 0 auto;">
+                Our platform combines cutting-edge machine learning with established psychological assessment methods 
+                to provide comprehensive insights into social anxiety. With over 10,000 data points and multiple 
+                validated models, we offer accurate predictions and actionable insights for mental health awareness.
+            </p>
+        </div>
+
+        <div class="card-grid" style="margin-top: 3rem;">
+            <div class="card">
+                <h3>🎯 Accurate Predictions</h3>
+                <p>Multiple ML models trained on 10,000+ samples with R² scores above 0.85.</p>
+            </div>
+            <div class="card">
+                <h3>🔒 Privacy First</h3>
+                <p>All analysis is performed confidentially. Your data never leaves your session.</p>
+            </div>
+            <div class="card">
+                <h3>📈 Evidence-Based</h3>
+                <p>Built on established psychological research and validated assessment methods.</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <p>The Observer is the Observed.
+            <div class="signature"> - J. Krishnamurti</div>
+        </p>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 अंतर्दृष्टि | For educational and research purposes</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+            This tool is designed to support awareness and understanding. Always consult healthcare professionals for diagnosis and treatment.
+        </p>
+    </footer>
+</body>
+</html>

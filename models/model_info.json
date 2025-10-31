@@ -1,0 +1,52 @@
+{
+  "random_forest": {
+    "name": "Random Forest",
+    "description": "Ensemble of decision trees with high accuracy and interpretability",
+    "train_r2": 0.9661,
+    "test_r2": 0.7764,
+    "mae": 0.8212,
+    "rmse": 1.0179,
+    "cv_score": 0.761,
+    "cv_std": 0.0152
+  },
+  "xgboost": {
+    "name": "XGBoost",
+    "description": "Gradient boosting with excellent performance on structured data",
+    "train_r2": 0.9482,
+    "test_r2": 0.7647,
+    "mae": 0.8459,
+    "rmse": 1.0442,
+    "cv_score": 0.7454,
+    "cv_std": 0.0156
+  },
+  "gradient_boosting": {
+    "name": "Gradient Boosting",
+    "description": "Sequential ensemble method with strong predictive power",
+    "train_r2": 0.8635,
+    "test_r2": 0.7733,
+    "mae": 0.83,
+    "rmse": 1.0249,
+    "cv_score": 0.756,
+    "cv_std": 0.016
+  },
+  "svr": {
+    "name": "Support Vector Regression",
+    "description": "Kernel-based method effective for complex non-linear relationships",
+    "train_r2": 0.7183,
+    "test_r2": 0.7258,
+    "mae": 0.8941,
+    "rmse": 1.1271,
+    "cv_score": 0.7079,
+    "cv_std": 0.0158
+  },
+  "neural_network": {
+    "name": "Neural Network",
+    "description": "Deep learning approach with multiple hidden layers",
+    "train_r2": 0.7265,
+    "test_r2": 0.7241,
+    "mae": 0.9137,
+    "rmse": 1.1306,
+    "cv_score": 0.7212,
+    "cv_std": 0.0359
+  }
+}

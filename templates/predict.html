@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anxiety Level Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">
+                Intraspection
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/predict">Anxiety Prediction</a></li>
+                <li><a href="/disparity">Disparity Calculator</a></li>
+                <li><a href="/profiling">Psychological Profiling</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero" style="padding: 2rem 0;">
+            <h1 style="font-size: 2.5rem;">Anxiety Prediction with Machine Learning</h1>
+            <p>Select a model and enter your information to predict anxiety levels</p>
+        </div>
+
+        <!-- Model Selection -->
+        <div class="form-section">
+            <h2 style="margin-bottom: 1.5rem;">Step 1: Choose Your Model</h2>
+            <div class="model-grid" id="modelGrid">
+                {% for key, info in models.items() %}
+                <div class="model-card" data-model="{{ key }}">
+                    <h3>{{ info.name }}</h3>
+                    <p>{{ info.description }}</p>
+                    <div class="model-stats">
+                        <div class="stat">
+                            <span class="stat-label">Accuracy (R²)</span>
+                            <span class="stat-value">{{ info.test_r2 }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">MAE</span>
+                            <span class="stat-value">{{ info.mae }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">CV Score</span>
+                            <span class="stat-value">{{ info.cv_score }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="form-section">
+            <h2 style="margin-bottom: 1.5rem;">Step 2: Enter Your Information</h2>
+            <form id="predictionForm">
+                <input type="hidden" id="selectedModel" name="model" value="random_forest">
+                
+                <h3 style="margin-bottom: 1rem; color: var(--primary);">Demographics</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" min="18" max="100" value="30" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="occupation">Occupation</label>
+                        <select id="occupation" name="occupation" required>
+                            <option value="0">Student</option>
+                            <option value="1">Teacher</option>
+                            <option value="2">Engineer</option>
+                            <option value="3">Doctor</option>
+                            <option value="4">Nurse</option>
+                            <option value="5">Artist</option>
+                            <option value="6">Musician</option>
+                            <option value="7">Lawyer</option>
+                            <option value="8">Scientist</option>
+                            <option value="9">Chef</option>
+                            <option value="10">Athlete</option>
+                            <option value="11">Freelancer</option>
+                            <option value="12">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem; color: var(--primary);">Lifestyle Factors</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="sleep_hours">Sleep Hours per Night <span class="range-value" id="sleepValue">7.0</span></label>
+                        <input type="range" id="sleep_hours" name="sleep_hours" min="2" max="12" step="0.1" value="7" oninput="updateRangeValue('sleep', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="physical_activity">Physical Activity (hrs/week) <span class="range-value" id="activityValue">3.0</span></label>
+                        <input type="range" id="physical_activity" name="physical_activity" min="0" max="20" step="0.1" value="3" oninput="updateRangeValue('activity', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="caffeine_intake">Caffeine Intake (mg/day) <span class="range-value" id="caffeineValue">200</span></label>
+                        <input type="range" id="caffeine_intake" name="caffeine_intake" min="0" max="800" step="10" value="200" oninput="updateRangeValue('caffeine', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="alcohol_consumption">Alcohol (drinks/week) <span class="range-value" id="alcoholValue">2</span></label>
+                        <input type="range" id="alcohol_consumption" name="alcohol_consumption" min="0" max="20" step="1" value="2" oninput="updateRangeValue('alcohol', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="smoking">Smoking</label>
+                        <select id="smoking" name="smoking" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="diet_quality">Diet Quality (1-10) <span class="range-value" id="dietValue">5</span></label>
+                        <input type="range" id="diet_quality" name="diet_quality" min="1" max="10" step="1" value="5" oninput="updateRangeValue('diet', this.value)">
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem; color: var(--primary);">Health Indicators</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="heart_rate">Heart Rate (bpm) <span class="range-value" id="heartValue">75</span></label>
+                        <input type="range" id="heart_rate" name="heart_rate" min="50" max="150" step="1" value="75" oninput="updateRangeValue('heart', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="breathing_rate">Breathing Rate (breaths/min) <span class="range-value" id="breathingValue">16</span></label>
+                        <input type="range" id="breathing_rate" name="breathing_rate" min="10" max="30" step="1" value="16" oninput="updateRangeValue('breathing', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="stress_level">Stress Level (1-10) <span class="range-value" id="stressValue">5</span></label>
+                        <input type="range" id="stress_level" name="stress_level" min="1" max="10" step="1" value="5" oninput="updateRangeValue('stress', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="sweating_level">Sweating Level (1-5) <span class="range-value" id="sweatingValue">2</span></label>
+                        <input type="range" id="sweating_level" name="sweating_level" min="1" max="5" step="1" value="2" oninput="updateRangeValue('sweating', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="dizziness">Dizziness</label>
+                        <select id="dizziness" name="dizziness" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem; color: var(--primary);">Mental Health History</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="family_history">Family History of Anxiety</label>
+                        <select id="family_history" name="family_history" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="medication">Currently on Medication</label>
+                        <select id="medication" name="medication" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="therapy_sessions">Therapy Sessions (per month) <span class="range-value" id="therapyValue">0</span></label>
+                        <input type="range" id="therapy_sessions" name="therapy_sessions" min="0" max="12" step="1" value="0" oninput="updateRangeValue('therapy', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="recent_life_event">Recent Major Life Event</label>
+                        <select id="recent_life_event" name="recent_life_event" required>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">
+                        Predict Anxiety Level
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="result-section hidden">
+            <h2>Prediction Results</h2>
+            <div class="result-value" id="predictionValue">-</div>
+            <div class="result-category" id="categoryBadge">-</div>
+            <p class="result-description" id="resultDescription">-</p>
+            <div style="margin-top: 1.5rem; color: var(--gray);">
+                <p><strong>Model Used:</strong> <span id="modelUsed">-</span></p>
+                <p id="confidenceInfo" class="hidden"><strong>Confidence:</strong> <span id="confidenceValue">-</span>%</p>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="hidden">
+            <div class="spinner"></div>
+            <p style="text-align: center; color: var(--gray); margin-top: 1rem;">Analyzing your data...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 अंतर्दृष्टि | For educational and research purposes</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+            This tool is designed to support awareness and understanding. Always consult healthcare professionals for diagnosis and treatment.
+        </p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/predict.js') }}"></script>
+</body>
+</html>
